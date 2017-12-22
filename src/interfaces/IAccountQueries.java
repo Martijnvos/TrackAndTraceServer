@@ -2,9 +2,16 @@ package interfaces;
 
 import classes.Account;
 
-public interface IAccountQueries {
-    Account getAccount(int accountID);
-    boolean addAccount(Account account);
-    boolean updateAccount(Account account);
-    boolean deleteAccount(int accountID);
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+
+public interface IAccountQueries extends Remote {
+    Account getAccount(int accountID) throws RemoteException;
+    boolean addAccount(Account account) throws RemoteException;
+    boolean updateAccount(Account account) throws RemoteException;
+    boolean deleteAccount(int accountID) throws RemoteException;
+
+    Account logIn(String username, String password) throws RemoteException;
+    boolean logOut(Account account) throws RemoteException;
 }

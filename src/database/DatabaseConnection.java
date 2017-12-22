@@ -25,13 +25,21 @@ public class DatabaseConnection {
         }
     }
 
-    public static void initConnection() throws SQLException {
+    /**
+     * Setup connection with database
+     * @throws SQLException when VPN is not connected, database can't be reached or credentials are false
+     */
+    private static void initConnection() throws SQLException {
         connection = DriverManager.getConnection(Globals.dbUrl, connectionProps);
         System.out.println("Successfully connected to database");
     }
 
+    /**
+     * Close connection to the database
+     * @throws SQLException when database can't be reached
+     */
     public static void closeConnection() throws SQLException {
         connection.close();
-        System.out.println("DatabaseConnection to database closed");
+        System.out.println("Connection to database closed");
     }
 }
