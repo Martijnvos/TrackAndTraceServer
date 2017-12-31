@@ -6,6 +6,8 @@ import enums.Status;
 import globals.Globals;
 import interfaces.IPackageQueries;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -15,7 +17,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-public class PackageQueries implements IPackageQueries {
+public class PackageQueries implements IPackageQueries, Serializable {
 
     private DatabaseConnection connection;
 

@@ -7,13 +7,15 @@ import enums.Status;
 import globals.Globals;
 import interfaces.IAccountQueries;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class AccountQueries implements IAccountQueries {
+public class AccountQueries implements IAccountQueries, Serializable {
 
     private DatabaseConnection connection;
 
