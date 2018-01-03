@@ -140,17 +140,18 @@ public class PackageQueries implements IPackageQueries, Serializable {
     /**
      * Update Package details in database according to given Package
      * @param packageInstantiation Package instantiation with updated values
+     * @param accountID ID of account which holds edited Package
      * @return true/false depending on success of updating in database
      */
     @Override
-    public boolean updatePackage(Package packageInstantiation) {
+    public boolean updatePackage(Package packageInstantiation, int accountID) {
         String updatePackageQuery = "EXEC UpdatePackage ?,?,?,?,?,?,?,?,?,?,?,?";
         PreparedStatement statement;
 
         try {
             statement = connection.getConnection().prepareStatement(updatePackageQuery);
             statement.setInt(1, packageInstantiation.getID());
-            statement.setInt(2, Globals.loggedInAccount.getID());
+            statement.setInt(2, accountID);
             statement.setString(3, packageInstantiation.getName());
             statement.setString(4, packageInstantiation.getFromCompany());
             statement.setString(5, packageInstantiation.getShippingType().name());

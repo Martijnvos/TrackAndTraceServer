@@ -124,4 +124,13 @@ public class Package implements Serializable {
         this.locationLat = locationLat;
         this.locationLong = locationLong;
     }
+
+    @Override
+    public String toString() {
+        if (getName() != null) {
+            return String.format("ID : %d, Name : %s, Shippingtype: %s, Status: %s", getID(), getName(), getShippingType(), getStatus());
+        } else {
+            return String.format("ID : %d, Name : Not provided, Shippingtype: %s, Status: %s", getID(), getShippingType(), getStatus());
+        }
+    }
 }
