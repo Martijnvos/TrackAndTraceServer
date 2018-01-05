@@ -112,13 +112,13 @@ public class PackageQueries implements IPackageQueries, Serializable {
      * @return true/false depending on success of saving in database
      */
     @Override
-    public boolean addPackage(Package packageInstantiation) {
+    public boolean addPackage(Package packageInstantiation, int accountID) {
         String addPackageQuery = "EXEC InsertPackage ?,?,?,?,?,?,?,?,?,?,?";
         PreparedStatement statement;
 
         try {
             statement = connection.getConnection().prepareStatement(addPackageQuery);
-            statement.setInt(1, Globals.loggedInAccount.getID());
+            statement.setInt(1, accountID);
             statement.setString(2, packageInstantiation.getName());
             statement.setString(3, packageInstantiation.getFromCompany());
             statement.setString(4, packageInstantiation.getShippingType().name());
