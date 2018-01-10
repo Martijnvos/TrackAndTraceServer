@@ -155,6 +155,10 @@ public class AccountQueries implements IAccountQueries, Serializable {
                         result.getBoolean(4),
                         result.getString(5),
                         result.getString(6));
+
+                Globals.loggedInAccount = correspondingAccount;
+                Globals.database.setPackageLocationUpdates();
+
                 return correspondingAccount;
             }
         } catch (SQLException e) {
@@ -166,6 +170,8 @@ public class AccountQueries implements IAccountQueries, Serializable {
 
     @Override
     public boolean logOut(Account account) {
+        Globals.loggedInAccount = null;
+        Globals.database.unSetPackageLocationUpdates();
         throw new NotImplementedException();
     }
 

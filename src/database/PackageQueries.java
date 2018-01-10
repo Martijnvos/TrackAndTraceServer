@@ -3,6 +3,9 @@ package database;
 import classes.Package;
 import enums.ShippingType;
 import enums.Status;
+import fontyspublisher.IRemotePropertyListener;
+import fontyspublisher.IRemotePublisherForListener;
+import fontyspublisher.RemotePublisher;
 import globals.Globals;
 import interfaces.IPackageQueries;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -43,6 +46,7 @@ public class PackageQueries implements IPackageQueries, Serializable {
             if (result.next()){
                 Package correspondingPackage = new Package(
                         result.getInt(1),
+                        result.getInt(2),
                         result.getString(3),
                         result.getString(4),
                         ShippingType.valueOf(result.getString(5)),
@@ -59,6 +63,43 @@ public class PackageQueries implements IPackageQueries, Serializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return null;
+    }
+
+    //TODO Remove when not necessary because of possible security hole
+    public ArrayList<Package> getAllPackages() {
+        ArrayList<Package> allPackages = new ArrayList<>();
+
+        String getAllPackagesQuery = "EXEC GetAllPackages";
+        PreparedStatement statement;
+        ResultSet result;
+
+        try {
+            statement = connection.getConnection().prepareStatement(getAllPackagesQuery);
+            result = statement.executeQuery();
+            while (result.next()) {
+                Package correspondingPackage = new Package(
+                        result.getInt(1),
+                        result.getString(3),
+                        result.getString(4),
+                        ShippingType.valueOf(result.getString(5)),
+                        Status.valueOf(result.getString(6)),
+                        result.getString(7),
+                        result.getInt(8),
+                        result.getString(9),
+                        result.getDate(10).toLocalDate(),
+                        result.getDouble(11),
+                        result.getDouble(12));
+
+                allPackages.add(correspondingPackage);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        if (allPackages.size() != 0) return allPackages;
 
         return null;
     }
@@ -83,6 +124,7 @@ public class PackageQueries implements IPackageQueries, Serializable {
             while (result.next()){
                 Package correspondingPackage = new Package(
                         result.getInt(1),
+                        result.getInt(2),
                         result.getString(3),
                         result.getString(4),
                         ShippingType.valueOf(result.getString(5)),
@@ -112,13 +154,13 @@ public class PackageQueries implements IPackageQueries, Serializable {
      * @return true/false depending on success of saving in database
      */
     @Override
-    public boolean addPackage(Package packageInstantiation, int accountID) {
+    public boolean addPackage(Package packageInstantiation) {
         String addPackageQuery = "EXEC InsertPackage ?,?,?,?,?,?,?,?,?,?,?";
         PreparedStatement statement;
 
         try {
             statement = connection.getConnection().prepareStatement(addPackageQuery);
-            statement.setInt(1, accountID);
+            statement.setInt(1, packageInstantiation.getAccountID());
             statement.setString(2, packageInstantiation.getName());
             statement.setString(3, packageInstantiation.getFromCompany());
             statement.setString(4, packageInstantiation.getShippingType().name());
@@ -130,28 +172,32 @@ public class PackageQueries implements IPackageQueries, Serializable {
             statement.setDouble(10, packageInstantiation.getLocationLat());
             statement.setDouble(11, packageInstantiation.getLocationLong());
             statement.execute();
-            return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
+
+        // Reset the package updates to propagate a new list of packages for the specific Account
+        Globals.database.unSetPackageLocationUpdates();
+        Globals.database.setPackageLocationUpdates();
+
+        return true;
     }
 
     /**
      * Update Package details in database according to given Package
      * @param packageInstantiation Package instantiation with updated values
-     * @param accountID ID of account which holds edited Package
      * @return true/false depending on success of updating in database
      */
     @Override
-    public boolean updatePackage(Package packageInstantiation, int accountID) {
+    public boolean updatePackage(Package packageInstantiation) {
         String updatePackageQuery = "EXEC UpdatePackage ?,?,?,?,?,?,?,?,?,?,?,?";
         PreparedStatement statement;
 
         try {
             statement = connection.getConnection().prepareStatement(updatePackageQuery);
             statement.setInt(1, packageInstantiation.getID());
-            statement.setInt(2, accountID);
+            statement.setInt(2, packageInstantiation.getAccountID());
             statement.setString(3, packageInstantiation.getName());
             statement.setString(4, packageInstantiation.getFromCompany());
             statement.setString(5, packageInstantiation.getShippingType().name());
@@ -164,11 +210,19 @@ public class PackageQueries implements IPackageQueries, Serializable {
             statement.setDouble(12, packageInstantiation.getLocationLong());
 
             statement.executeUpdate();
-            return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
+
+        try {
+            RemotePublisher remotePublisher = Globals.database.getRemotePublisher();
+            remotePublisher.inform(Globals.remotePublisherPackageChangesString, null, packageInstantiation);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return true;
     }
 
     /**

@@ -7,11 +7,10 @@ import java.lang.reflect.Field;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
+
 public class Main {
     public static void main (String[] arguments) {
         addAuthDLL();
-
-        Database database = new Database();
 
         try {
             Globals.registry = LocateRegistry.createRegistry(1099);
@@ -19,6 +18,7 @@ public class Main {
             e.printStackTrace();
         }
 
+        Database database = new Database();
         database.bindObjectsToRegistry();
     }
 
