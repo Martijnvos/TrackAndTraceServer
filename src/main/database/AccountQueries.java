@@ -57,6 +57,38 @@ public class AccountQueries implements IAccountQueries, Serializable {
     }
 
     /**
+     * Helper method for tests in which the complete Account is fetched by username
+     * @param userName the username of the account to be fetched
+     * @return account instance corresponding to the username or null of not applicable
+     */
+    public Account getAccountByUserName(String userName) {
+        String getAccountByUsernameQuery = "EXEC GetAccountByUserName ?";
+        PreparedStatement statement;
+        ResultSet result;
+
+        try {
+            statement = connection.getConnection().prepareStatement(getAccountByUsernameQuery);
+            statement.setString(1, userName);
+            result = statement.executeQuery();
+            if (result.next()){
+                Account correspondingAccount = new Account(
+                        result.getInt(1),
+                        result.getString(2),
+                        result.getString(3),
+                        result.getBoolean(4),
+                        result.getString(5),
+                        result.getString(6));
+
+                return correspondingAccount;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
      * Add the given Account to the database
      * @param account correct Account instantiation with corresponding information
      * @return true/false depending on success of saving in database
@@ -113,6 +145,7 @@ public class AccountQueries implements IAccountQueries, Serializable {
      * @param accountID ID of Account that has to be deleted
      * @return true/false depending on success of deletion in database
      */
+    @SuppressWarnings("Duplicates")
     @Override
     public boolean deleteAccount(int accountID) {
         String updateAccountQuery = "EXEC DeleteAccount ?";
@@ -157,7 +190,6 @@ public class AccountQueries implements IAccountQueries, Serializable {
                         result.getString(6));
 
                 Globals.loggedInAccount = correspondingAccount;
-                Globals.database.setPackageLocationUpdates();
 
                 return correspondingAccount;
             }

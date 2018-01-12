@@ -8,6 +8,7 @@ import fontyspublisher.IRemotePublisherForListener;
 import fontyspublisher.RemotePublisher;
 import globals.Globals;
 import interfaces.IPackageQueries;
+import jdk.nashorn.internal.objects.Global;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.Serializable;
@@ -67,20 +68,24 @@ public class PackageQueries implements IPackageQueries, Serializable {
         return null;
     }
 
-    //TODO Remove when not necessary because of possible security hole
-    public ArrayList<Package> getAllPackages() {
-        ArrayList<Package> allPackages = new ArrayList<>();
-
-        String getAllPackagesQuery = "EXEC GetAllPackages";
+    /**
+     * Helper method for tests in which the complete Package is fetched by name
+     * @param name name of the Package to be fetched
+     * @return package instance corresponding to the name or null of not applicable
+     */
+    public Package getPackageByName(String name) {
+        String getPackageQuery = "EXEC GetPackageByName ?";
         PreparedStatement statement;
         ResultSet result;
 
         try {
-            statement = connection.getConnection().prepareStatement(getAllPackagesQuery);
+            statement = connection.getConnection().prepareStatement(getPackageQuery);
+            statement.setString(1, name);
             result = statement.executeQuery();
-            while (result.next()) {
+            if (result.next()){
                 Package correspondingPackage = new Package(
                         result.getInt(1),
+                        result.getInt(2),
                         result.getString(3),
                         result.getString(4),
                         ShippingType.valueOf(result.getString(5)),
@@ -92,14 +97,11 @@ public class PackageQueries implements IPackageQueries, Serializable {
                         result.getDouble(11),
                         result.getDouble(12));
 
-                allPackages.add(correspondingPackage);
+                return correspondingPackage;
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
-
-        if (allPackages.size() != 0) return allPackages;
 
         return null;
     }
@@ -178,8 +180,10 @@ public class PackageQueries implements IPackageQueries, Serializable {
         }
 
         // Reset the package updates to propagate a new list of packages for the specific Account
-        Globals.database.unSetPackageLocationUpdates();
-        Globals.database.setPackageLocationUpdates();
+        if (Globals.database != null) {
+            Globals.database.unSetPackageLocationUpdates();
+            Globals.database.setPackageLocationUpdates();
+        }
 
         return true;
     }
@@ -215,11 +219,13 @@ public class PackageQueries implements IPackageQueries, Serializable {
             return false;
         }
 
-        try {
-            RemotePublisher remotePublisher = Globals.database.getRemotePublisher();
-            remotePublisher.inform(Globals.remotePublisherPackageChangesString, null, packageInstantiation);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        if (Globals.database != null) {
+            try {
+                RemotePublisher remotePublisher = Globals.database.getRemotePublisher();
+                remotePublisher.inform(Globals.remotePublisherPackageChangesString, null, packageInstantiation);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
 
         return true;
@@ -230,6 +236,7 @@ public class PackageQueries implements IPackageQueries, Serializable {
      * @param packageID ID of Package to be removed
      * @return true/false depending on success of deletion from database
      */
+    @SuppressWarnings("Duplicates")
     @Override
     public boolean deletePackage(int packageID) {
         String deleteAccountQuery = "EXEC DeletePackage ?";

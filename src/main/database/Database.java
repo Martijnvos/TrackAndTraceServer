@@ -3,10 +3,14 @@ package database;
 import classes.Package;
 import fontyspublisher.RemotePublisher;
 import globals.Globals;
+import interfaces.IPackageUpdates;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Random;
@@ -15,7 +19,7 @@ import java.util.TimerTask;
 
 import static jdk.nashorn.internal.objects.NativeMath.round;
 
-public class Database {
+public class Database implements IPackageUpdates, Serializable {
     private DatabaseConnection databaseConnection;
 
     private Timer timer;
@@ -38,6 +42,9 @@ public class Database {
             remotePublisher = new RemotePublisher();
             Globals.registry.rebind(Globals.remotePublisherPackageBindingName, remotePublisher);
             remotePublisher.registerProperty(Globals.remotePublisherPackageChangesString);
+
+            Remote stub = UnicastRemoteObject.exportObject(this, 0);
+            Globals.registry.rebind(Globals.packageUpdateBindingName, stub);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -52,6 +59,7 @@ public class Database {
 
     public void setPackageLocationUpdates() {
         Random randomDouble = new Random();
+        timer = new Timer();
 
         ArrayList<Package> packages = packageQueries.getAllPackagesOfAccount(Globals.loggedInAccount.getID());
 

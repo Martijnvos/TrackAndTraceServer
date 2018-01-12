@@ -2,6 +2,7 @@ package database;
 
 import globals.Globals;
 
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.DriverManager;
@@ -24,6 +25,24 @@ public class DatabaseConnection {
 
             initConnection();
         } catch (UnknownHostException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Constructor used for testing purposes
+     * @param databaseName the name of the test database to connect with
+     */
+    public DatabaseConnection(String databaseName, boolean forTestDatabase) {
+        if (!forTestDatabase) return;
+
+        connectionProps = new Properties();
+        connectionProps.put("databaseName", databaseName);
+        connectionProps.put("integratedSecurity", "true");
+
+        try {
+            initConnection();
+        } catch(SQLException e) {
             e.printStackTrace();
         }
     }
