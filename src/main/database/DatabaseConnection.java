@@ -32,6 +32,7 @@ public class DatabaseConnection {
     /**
      * Constructor used for testing purposes
      * @param databaseName the name of the test database to connect with
+     * @param forTestDatabase boolean to make sure you understand your connecting with the test database
      */
     public DatabaseConnection(String databaseName, boolean forTestDatabase) {
         if (!forTestDatabase) return;

@@ -43,8 +43,7 @@ public class Database implements IPackageUpdates, Serializable {
             Globals.registry.rebind(Globals.remotePublisherPackageBindingName, remotePublisher);
             remotePublisher.registerProperty(Globals.remotePublisherPackageChangesString);
 
-            Remote stub = UnicastRemoteObject.exportObject(this, 0);
-            Globals.registry.rebind(Globals.packageUpdateBindingName, stub);
+            bindToRegistry();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -90,5 +89,20 @@ public class Database implements IPackageUpdates, Serializable {
 
     public void unSetPackageLocationUpdates() {
         timer.cancel();
+    }
+
+    /**
+     * Bind interface of this class to Registry
+     */
+    public void bindToRegistry() {
+        try {
+            Remote stub = UnicastRemoteObject.exportObject(this, 0);
+
+            // Bind the remote object's stub in the registry
+            Globals.registry.rebind(Globals.packageUpdateBindingName, stub);
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 }
