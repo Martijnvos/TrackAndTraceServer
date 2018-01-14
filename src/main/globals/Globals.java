@@ -4,6 +4,8 @@ import classes.Account;
 import database.Database;
 
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Globals {
     // Database class
@@ -25,5 +27,5 @@ public class Globals {
     public static final String packageUpdateBindingName = "packageUpdateBinding";
 
     // Account
-    public static Account loggedInAccount;
+    public static ArrayList<Integer> loggedInAccounts = new ArrayList<>();
 }

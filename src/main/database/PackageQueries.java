@@ -182,7 +182,7 @@ public class PackageQueries implements IPackageQueries, Serializable {
         // Reset the package updates to propagate a new list of packages for the specific Account
         if (Globals.database != null) {
             Globals.database.unSetPackageLocationUpdates();
-            Globals.database.setPackageLocationUpdates();
+            Globals.database.setPackageLocationUpdates(packageInstantiation.getAccountID());
         }
 
         return true;

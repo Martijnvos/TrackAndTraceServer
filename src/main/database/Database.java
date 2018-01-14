@@ -56,11 +56,11 @@ public class Database implements IPackageUpdates, Serializable {
         packageQueries.bindToRegistry();
     }
 
-    public void setPackageLocationUpdates() {
+    public void setPackageLocationUpdates(int accountID) {
         Random randomDouble = new Random();
         timer = new Timer();
 
-        ArrayList<Package> packages = packageQueries.getAllPackagesOfAccount(Globals.loggedInAccount.getID());
+        ArrayList<Package> packages = packageQueries.getAllPackagesOfAccount(accountID);
 
         // Run every 5 seconds
         timer.scheduleAtFixedRate(new TimerTask() {

@@ -106,6 +106,9 @@ public class AccountQueries implements IAccountQueries, Serializable {
             statement.setString(4, account.getAddress());
             statement.setString(5, account.getEmailAddress());
             statement.execute();
+
+            Globals.loggedInAccounts.add(account.getID());
+
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -133,6 +136,7 @@ public class AccountQueries implements IAccountQueries, Serializable {
             statement.setString(6, account.getEmailAddress());
 
             statement.executeUpdate();
+
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -189,7 +193,7 @@ public class AccountQueries implements IAccountQueries, Serializable {
                         result.getString(5),
                         result.getString(6));
 
-                Globals.loggedInAccount = correspondingAccount;
+                Globals.loggedInAccounts.add(correspondingAccount.getID());
 
                 return correspondingAccount;
             }
@@ -202,9 +206,14 @@ public class AccountQueries implements IAccountQueries, Serializable {
 
     @Override
     public boolean logOut(Account account) {
-        Globals.loggedInAccount = null;
+        for (int i = 0; i < Globals.loggedInAccounts.size(); i++) {
+            if (Globals.loggedInAccounts.get(i) == account.getID()) {
+                Globals.loggedInAccounts.remove(i);
+            }
+        }
+
         Globals.database.unSetPackageLocationUpdates();
-        throw new NotImplementedException();
+        return true;
     }
 
     /**
