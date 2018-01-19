@@ -83,12 +83,26 @@ public class Database implements IPackageUpdates, Serializable {
                 selectedPackage.setLocationLong(bigDecimalLongitude.doubleValue());
 
                 packageQueries.updatePackage(selectedPackage);
+
+                publishUpdate(selectedPackage);
+
             }
         }, 0, 5*1000);
     }
 
     public void unSetPackageLocationUpdates() {
         timer.cancel();
+    }
+
+    public void publishUpdate(Package newPackage) {
+        if (Globals.database != null) {
+            try {
+                RemotePublisher remotePublisher = Globals.database.getRemotePublisher();
+                remotePublisher.inform(Globals.remotePublisherPackageChangesString, null, newPackage);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

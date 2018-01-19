@@ -214,21 +214,12 @@ public class PackageQueries implements IPackageQueries, Serializable {
             statement.setDouble(12, packageInstantiation.getLocationLong());
 
             statement.executeUpdate();
+
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
-
-        if (Globals.database != null) {
-            try {
-                RemotePublisher remotePublisher = Globals.database.getRemotePublisher();
-                remotePublisher.inform(Globals.remotePublisherPackageChangesString, null, packageInstantiation);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return true;
     }
 
     /**
