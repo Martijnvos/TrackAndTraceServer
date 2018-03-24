@@ -1,8 +1,7 @@
 import classes.Account;
 import database.AccountQueries;
-import database.DatabaseConnection;;
+import database.DatabaseConnection;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
