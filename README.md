@@ -14,5 +14,5 @@ The application can be run by simply downloading the source code and running it 
 Keep in mind that the database has to be set up as well using the scripts provided.  
 After running the application you should see a console window highlighting the connection with the database and
 the bound RMI classes to the registry.  
-:warning: Warning: make sure this application is not run with a VPN or other IP changing service.  
-If this is the case it's not guaranteed that the client application can find th registry.
+:warning: Warning: make sure this and the client application is not run with a VPN or other IP changing service.  
+If this is the case it's not guaranteed that the client application can find the registry.
